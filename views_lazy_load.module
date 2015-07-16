@@ -29,7 +29,7 @@ function views_lazy_load_theme() {
  * Theme callback.
  */
 function theme_views_lazy_load_throbber() {
-  return '<div class="views-lazy-load">Loading...</div>';
+  return '<div class="views-lazy-load">'.t('Loading').'...</div>';
 }
 
 /**
