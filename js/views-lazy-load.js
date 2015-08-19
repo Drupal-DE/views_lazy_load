@@ -1,3 +1,7 @@
+/**
+ * @file
+ * Ajax refresh on views at page load
+ */
 (function($) {
 
   Drupal.behaviors.views_lazy_load = {

@@ -1,3 +1,7 @@
+/**
+ * @file
+ * Disable Alert.
+ */
 (function($) {
 
   /**

@@ -55,7 +55,15 @@ class ViewsLazyLoadTest extends DrupalWebTestCase {
     $view = $this->getTestView(TRUE);
     $output = $view->preview();
     $this->assertNotContains('Loading...', $output, 'The view output does not have the lazy loading text.');
+
+    // Make sure that our view won't be lazy under a crawler robot visit
+    // Set our agent to some robot's agent:
     unset($_GET['views_lazy_load_disabled']);
+    $_SERVER['HTTP_USER_AGENT'] = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
+    $view = $this->getTestView(TRUE);
+    $output = $view->preview();
+    $this->assertNotContains('Loading...', $output, 'The view output does not have the lazy loading text because of the webcrawler\'s agent.');
+
   }
 
   /**

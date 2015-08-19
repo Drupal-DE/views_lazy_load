@@ -4,7 +4,6 @@
  * @file
  * A display extender plugin for lazy loading a view.
  */
-
 class views_lazy_load_plugin_display_extender extends views_plugin_display_extender {
 
   /**
@@ -12,28 +11,32 @@ class views_lazy_load_plugin_display_extender extends views_plugin_display_exten
    */
   public function pre_execute() {
     if ($this->isEnabled() && empty($this->view->live_preview)) {
+      if (!$this->isExcludedUserAgent()) {
+        // Lazy loading requires an AJAX view.
+        $this->view->set_use_ajax(TRUE);
 
-      // Lazy loading requires an AJAX view.
-      $this->view->set_use_ajax(TRUE);
+        // Marking the view as executed prevents the Search API from querying
+        $this->view->executed = TRUE;
+        // This is a bit of a hack to make sure the view is always rendered when
+        // we're lazy loading the view. By setting an "empty" area handler in the
+        // header the view is rendered which is later used for switching in the
+        // results.
+        // @TODO, in the future we could clean out all area plugins first pass?
+        if (empty($this->display->default_display->options['empty'])) {
+          $this->addLoadingArea();
+        }
 
-      // Marking the view as executed prevents the Search API querying Sajari.
-      $this->view->executed = TRUE;
-
-      // This is a bit of a hack to make sure the view is always rendered when
-      // we're lazy loading the view. By setting an "empty" area handler in the
-      // header the view is rendered which is later used for switching in the
-      // results.
-      // @TODO, in the future we could clean out all area plugins first pass?
-      if (empty($this->display->default_display->options['empty'])) {
-        $this->addLoadingArea();
+        // Add our JavaScript to the page with an array of dom_ids that can be
+        // used client side to retrieve the view instance.
+        $path = drupal_get_path('module', 'views_lazy_load');
+        $settings[] = $this->view->dom_id;
+        drupal_add_js(array('views_lazy_load' => $settings), 'setting');
+        drupal_add_js($path . '/js/views-lazy-load.js', array('scope' => 'footer', 'weight' => 10));
       }
-
-      // Add our JavaScript to the page with an array of dom_ids that can be
-      // used client side to retrieve the view instance.
-      $path = drupal_get_path('module', 'views_lazy_load');
-      $settings[] = $this->view->dom_id;
-      drupal_add_js(array('views_lazy_load' => $settings), 'setting');
-      drupal_add_js($path . '/js/views-lazy-load.js', array('scope' => 'footer', 'weight' => 10));
+      else {
+        // Ensure that AJAX won't be used if a crawler is visiting the view
+        $this->view->set_use_ajax(FALSE);
+      }
     }
   }
 
@@ -42,6 +45,18 @@ class views_lazy_load_plugin_display_extender extends views_plugin_display_exten
    */
   function options_definition_alter(&$options) {
     $options['views_lazy_load_enabled'] = array('default' => FALSE);
+  }
+
+  /**
+   * Check the user agent string to see if it's one of our excluded agents.
+   *
+   * @return bool
+   *   TRUE if the current user agent should be excluded otherwise FALSE.
+   */
+  function isExcludedUserAgent() {
+    $user_agent = $_SERVER['HTTP_USER_AGENT'];
+    $excluded_user_agents = views_lazy_load_get_excluded_user_agents();
+    return (bool) preg_match("/$excluded_user_agents/i", $user_agent);
   }
 
   /**
