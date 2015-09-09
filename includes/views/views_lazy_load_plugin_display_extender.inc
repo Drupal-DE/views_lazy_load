@@ -15,16 +15,11 @@ class views_lazy_load_plugin_display_extender extends views_plugin_display_exten
         // Lazy loading requires an AJAX view.
         $this->view->set_use_ajax(TRUE);
 
-        // Marking the view as executed prevents the Search API from querying
+        // Marking the view as executed prevents the Search API querying.
         $this->view->executed = TRUE;
-        // This is a bit of a hack to make sure the view is always rendered when
-        // we're lazy loading the view. By setting an "empty" area handler in the
-        // header the view is rendered which is later used for switching in the
-        // results.
-        // @TODO, in the future we could clean out all area plugins first pass?
-        if (empty($this->display->default_display->options['empty'])) {
-          $this->addLoadingArea();
-        }
+
+        // Add the loading text in the area plugin.
+        $this->addLoadingArea();
 
         // Add our JavaScript to the page with an array of dom_ids that can be
         // used client side to retrieve the view instance.
@@ -126,16 +121,21 @@ class views_lazy_load_plugin_display_extender extends views_plugin_display_exten
    * Add a loading div to the view while we're loading the results.
    */
   protected function addLoadingArea() {
-    $options = array(
-      'id' => 'area',
-      'table' => 'views',
-      'field' => 'area',
-      'empty' => FALSE,
+    // Add a empty area plugin to this view display so it gets initialised.
+    $display_id = $this->display->display->id;
+    $handler_id = $this->view->add_item($display_id, 'empty', 'views', 'area', array(
+      'empty' => TRUE,
       'content' => theme('views_lazy_load_throbber'),
-    );
+    ));
 
-    $this->view->set_item('default', 'header', 'area', $options);
-    $this->display->default_display->options['empty'][] = $options;
+    // Now get the area plugin info back and initialise an area plugin.
+    $empty_info = $this->display->get_option('empty');
+    $area = views_get_handler('views', 'area', 'area');
+    $area->init($this->view, $empty_info[$handler_id]);
+
+    // We must add the area directly to the display_handler to make sure it gets
+    // rendered.
+    $this->display->handlers['empty'][$handler_id] = $area;
   }
 
 }

@@ -44,6 +44,9 @@ class ViewsLazyLoadTest extends DrupalWebTestCase {
     $output = $view->preview('page');
     $this->assertContains('Loading...', $output, 'The view output has the lazy loading text.');
 
+    // Assert the view display to make sure we're getting the right display.
+    $this->assertContains('view-display-id-page', $output, 'Correct display title');
+
     // Make sure AJAX is forced on with lazy loading.
     $view = $this->getTestView(TRUE);
     $view->preview();
