@@ -39,10 +39,12 @@ class ViewsLazyLoadTest extends DrupalWebTestCase {
     $output = $view->preview();
     $this->assertNotContains('Loading...', $output, 'The view output does not have the lazy loading text.');
 
-    // Update the view to be lazy, re-render and expect the loading indicator.
+    // Update the view to be lazy, re-render and expect the exact loading
+    // indicator, using theme_views_lazy_load_throbber to ensure no incorrectly
+    // escaped HTML.
     $view = $this->getTestView(TRUE);
     $output = $view->preview('page');
-    $this->assertContains('Loading...', $output, 'The view output has the lazy loading text.');
+    $this->assertContains(theme('views_lazy_load_throbber'), $output, 'The view output has the lazy loading text.');
 
     // Assert the view display to make sure we're getting the right display.
     $this->assertContains('view-display-id-page', $output, 'Correct display title');

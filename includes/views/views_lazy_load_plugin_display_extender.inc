@@ -125,6 +125,7 @@ class views_lazy_load_plugin_display_extender extends views_plugin_display_exten
     $display_id = $this->display->display->id;
     $handler_id = $this->view->add_item($display_id, 'empty', 'views', 'area', array(
       'empty' => TRUE,
+      'format' => 'full_html',
       'content' => theme('views_lazy_load_throbber'),
     ));
 
