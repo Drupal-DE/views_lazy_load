@@ -10,15 +10,10 @@
  */
 function views_lazy_load_theme() {
   return array(
-    'views_lazy_load_throbber' => array(),
+    'views_lazy_load_throbber' => [
+      'variables' => [],
+    ],
   );
-}
-
-/**
- * Theme callback.
- */
-function theme_views_lazy_load_throbber() {
-  return '<div class="views-lazy-load">' . t('Loading') . '...</div>';
 }
 
 /**

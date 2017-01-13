@@ -157,7 +157,7 @@ class LazyLoadDisplayExtender extends DisplayExtenderPluginBase {
     // Add an empty area plugin to this view display so it gets initialised.
     $display_id = $this->displayHandler->display['id'];
     $content = [
-      'value' => '<div uk-spinner></div>',
+      '#theme' => 'views_lazy_load_throbber',
     ];
     $handler_settings = [
       'empty' => TRUE,
