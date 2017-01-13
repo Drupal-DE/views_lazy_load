@@ -1,5 +1,5 @@
 {
   "name": "drupal/views_lazy_load",
-  "type": "drupal/module",
+  "type": "drupal-module",
   "minimum-stability": "dev"
 }
