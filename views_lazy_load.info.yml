@@ -1,0 +1,8 @@
+type: module
+name: Views Lazy Load
+description: Lazy load any views content via AJAX
+package: Views
+core: 8.x
+
+dependencies:
+  - views

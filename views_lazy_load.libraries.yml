@@ -1,0 +1,5 @@
+lazy_load:
+  js:
+    js/views_lazy_load.js: {}
+  dependencies:
+    - views/views.ajax
